@@ -1,217 +1,180 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N-Body Gravity Simulation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #010409; color: #cde; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+  h1 { font-size: 14px; letter-spacing: 3px; color: #7af; margin-bottom: 14px; text-transform: uppercase; }
+  canvas { display: block; background: #020610; border-radius: 12px; cursor: crosshair; max-width: 100%; border: 0.5px solid #1a2a4a; }
+  .ctrl { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+  .ctrl button { font-family: monospace; font-size: 12px; padding: 6px 14px; background: transparent; border: 0.5px solid #2a4a7a; border-radius: 6px; color: #9bc; cursor: pointer; transition: background 0.15s; }
+  .ctrl button:hover { background: #0d1a2e; }
+  .ctrl label { font-size: 12px; color: #678; display: flex; align-items: center; gap: 6px; }
+  .ctrl input[type=range] { width: 80px; accent-color: #4af; }
+  #info { font-size: 11px; color: #456; margin-top: 8px; text-align: center; }
+  .hint { font-size: 11px; color: #4af; background: rgba(0,10,30,0.8); padding: 4px 10px; border-radius: 4px; position: absolute; top: 12px; left: 14px; pointer-events: none; }
+  .wrap { position: relative; }
+</style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1">&lt;title&gt;N-Body Gravity Simulation&lt;/title&gt;</p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>* { box-sizing: border-box; margin: 0; padding: 0; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>body { background: #010409; color: #cde; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>h1 { font-size: 14px; letter-spacing: 3px; color: #7af; margin-bottom: 14px; text-transform: uppercase; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>canvas { display: block; background: #020610; border-radius: 12px; cursor: crosshair; max-width: 100%; border: 0.5px solid #1a2a4a; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.ctrl { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.ctrl button { font-family: monospace; font-size: 12px; padding: 6px 14px; background: transparent; border: 0.5px solid #2a4a7a; border-radius: 6px; color: #9bc; cursor: pointer; transition: background 0.15s; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.ctrl button:hover { background: #0d1a2e; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.ctrl label { font-size: 12px; color: #678; display: flex; align-items: center; gap: 6px; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.ctrl input[type=range] { width: 80px; accent-color: #4af; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>#info { font-size: 11px; color: #456; margin-top: 8px; text-align: center; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.hint { font-size: 11px; color: #4af; background: rgba(0,10,30,0.8); padding: 4px 10px; border-radius: 4px; position: absolute; top: 12px; left: 14px; pointer-events: none; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>.wrap { position: relative; }</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1">&lt;h1&gt;N-Body Gravity Simulation&lt;/h1&gt;</p>
-<p class="p1">&lt;div class="wrap"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;canvas id="c" width="820" height="520"&gt;&lt;/canvas&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="hint"&gt;Click canvas to add a body · Real Newtonian gravity&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p1">&lt;div class="ctrl"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="btn-pause"&gt;⏸ Pause&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="btn-reset"&gt;↺ Reset&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="btn-trail"&gt;Trails: ON&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;label&gt;Speed &lt;input type="range" id="speed" min="0.2" max="4" step="0.1" value="1"&gt; &lt;span id="spv"&gt;1.0×&lt;/span&gt;&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;label&gt;G &lt;input type="range" id="grav" min="100" max="2000" step="50" value="600"&gt; &lt;span id="gv"&gt;600&lt;/span&gt;&lt;/label&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p1">&lt;div id="info"&gt;Bodies: &lt;span id="nb"&gt;0&lt;/span&gt; · F = G·m₁·m₂ / r² computed every frame&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">const canvas = document.getElementById('c');</p>
-<p class="p1">const ctx = canvas.getContext('2d');</p>
-<p class="p1">const W = canvas.width, H = canvas.height;</p>
-<p class="p2"><br></p>
-<p class="p1">let bodies = [], paused = false, showTrail = true, G = 600, speedMult = 1;</p>
-<p class="p1">const COLORS = ['#4af','#fa4','#f4a','#4fa','#a4f','#f44','#4ff','#ff4','#af4'];</p>
-<p class="p1">const TRAIL_LEN = 200;</p>
-<p class="p2"><br></p>
-<p class="p1">function makeStar(x, y, vx, vy, mass, color) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>return { x, y, vx, vy, mass, color, trail: [], r: Math.cbrt(mass) * 1.5 };</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function spawnDefault() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bodies = [];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const cx = W/2, cy = H/2;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bodies.push(makeStar(cx, cy, 0, 0, 9000, '#ffe08a'));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const orbits = [</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{r:90,<span class="Apple-converted-space">  </span>m:120, c:'#4af'},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{r:145, m:200, c:'#4fa'},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{r:205, m:80,<span class="Apple-converted-space">  </span>c:'#f4a'},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{r:270, m:300, c:'#a4f'},</p>
-<p class="p1"><span class="Apple-converted-space">  </span>];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>orbits.forEach(o =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const angle = Math.random() * Math.PI * 2;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const x = cx + Math.cos(angle) * o.r;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const y = cy + Math.sin(angle) * o.r;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const speed = Math.sqrt(G * 9000 / o.r);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>bodies.push(makeStar(x, y, -Math.sin(angle)*speed, Math.cos(angle)*speed, o.m, o.c));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p1">spawnDefault();</p>
-<p class="p2"><br></p>
-<p class="p1">let bgStars = [];</p>
-<p class="p1">for(let i = 0; i &lt; 200; i++) bgStars.push({x: Math.random()*W, y: Math.random()*H, b: Math.random()});</p>
-<p class="p2"><br></p>
-<p class="p1">let lastTime = null;</p>
-<p class="p1">function step(ts) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (!lastTime) lastTime = ts;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let dt = Math.min((ts - lastTime) / 1000, 0.03) * speedMult;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>lastTime = ts;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (!paused) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let i = 0; i &lt; bodies.length; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>bodies[i].ax = 0; bodies[i].ay = 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let j = 0; j &lt; bodies.length; j++) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (i === j) continue;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const dx = bodies[j].x - bodies[i].x;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const dy = bodies[j].y - bodies[i].y;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const d2 = dx*dx + dy*dy;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const d = Math.sqrt(d2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (d &lt; bodies[i].r + bodies[j].r) continue;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const f = G * bodies[j].mass / (d2 + 80);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>bodies[i].ax += f * dx / d;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>bodies[i].ay += f * dy / d;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>bodies.forEach(b =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b.vx += b.ax * dt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b.vy += b.ay * dt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b.x<span class="Apple-converted-space">  </span>+= b.vx * dt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b.y<span class="Apple-converted-space">  </span>+= b.vy * dt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b.trail.push({x: b.x, y: b.y});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (b.trail.length &gt; TRAIL_LEN) b.trail.shift();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>bodies = bodies.filter((b, i) =&gt; i === 0 || (b.x &gt; -W &amp;&amp; b.x &lt; W*2 &amp;&amp; b.y &gt; -H &amp;&amp; b.y &lt; H*2));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('nb').textContent = bodies.length;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// Clear</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (showTrail) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = 'rgba(2,6,16,0.16)';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = '#020610';</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillRect(0, 0, W, H);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// BG stars</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bgStars.forEach(s =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const a = 0.15 + 0.25 * Math.sin(ts * 0.0008 + s.b * 9);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = `rgba(190,210,255,${a})`;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.beginPath(); ctx.arc(s.x, s.y, 0.8, 0, Math.PI*2); ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// Trails</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (showTrail) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>bodies.forEach(b =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (b.trail.length &lt; 2) return;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>for (let i = 1; i &lt; b.trail.length; i++) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const a = (i / b.trail.length) * 0.75;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.strokeStyle = b.color + Math.floor(a * 255).toString(16).padStart(2, '0');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.lineWidth = 0.7 + a * 1.5;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.moveTo(b.trail[i-1].x, b.trail[i-1].y);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.lineTo(b.trail[i].x, <span class="Apple-converted-space">  </span>b.trail[i].y);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ctx.stroke();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>// Bodies</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bodies.forEach(b =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Glow</p>
-<p class="p1"><span class="Apple-converted-space">    </span>for (let g = 4; g &gt; 0; g--) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.arc(b.x, b.y, b.r + g * 3.5, 0, Math.PI*2);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.fillStyle = b.color + ['18','11','09','05'][g-1];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = b.color;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Specular</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.35, b.r * 0.38, 0, Math.PI*2);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillStyle = 'rgba(255,255,255,0.3)';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Mass label</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (b.mass &gt; 500) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.fillStyle = 'rgba(255,240,150,0.6)';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.font = '10px monospace';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.textAlign = 'center';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>ctx.fillText('M=' + Math.round(b.mass), b.x, b.y - b.r - 5);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>requestAnimationFrame(step);</p>
-<p class="p1">}</p>
-<p class="p1">requestAnimationFrame(step);</p>
-<p class="p2"><br></p>
-<p class="p1">canvas.addEventListener('click', e =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const rect = canvas.getBoundingClientRect();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const mx = (e.clientX - rect.left) * (W / rect.width);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const my = (e.clientY - rect.top)<span class="Apple-converted-space">  </span>* (H / rect.height);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let nearest = bodies[0], minD = Infinity;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bodies.forEach(b =&gt; { const d = Math.hypot(b.x-mx, b.y-my); if(d&lt;minD){minD=d;nearest=b;} });</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const dx = nearest.x - mx, dy = nearest.y - my;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const d = Math.hypot(dx, dy) || 1;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const speed = Math.sqrt(G * nearest.mass / d) * 0.88;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const col = COLORS[Math.floor(Math.random() * COLORS.length)];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const mass = 60 + Math.random() * 200;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bodies.push(makeStar(mx, my, -(dy/d)*speed + nearest.vx, (dx/d)*speed + nearest.vy, mass, col));</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">document.getElementById('btn-pause').onclick = function() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>paused = !paused; lastTime = null;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>this.textContent = paused ? '▶ Play' : '⏸ Pause';</p>
-<p class="p1">};</p>
-<p class="p1">document.getElementById('btn-reset').onclick = () =&gt; spawnDefault();</p>
-<p class="p1">document.getElementById('btn-trail').onclick = function() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>showTrail = !showTrail;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>this.textContent = 'Trails: ' + (showTrail ? 'ON' : 'OFF');</p>
-<p class="p1">};</p>
-<p class="p1">document.getElementById('speed').oninput = function() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>speedMult = parseFloat(this.value);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('spv').textContent = speedMult.toFixed(1) + '×';</p>
-<p class="p1">};</p>
-<p class="p1">document.getElementById('grav').oninput = function() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>G = parseInt(this.value);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('gv').textContent = G;</p>
-<p class="p1">};</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<h1>N-Body Gravity Simulation</h1>
+<div class="wrap">
+  <canvas id="c" width="820" height="520"></canvas>
+  <div class="hint">Click canvas to add a body · Real Newtonian gravity</div>
+</div>
+<div class="ctrl">
+  <button id="btn-pause">⏸ Pause</button>
+  <button id="btn-reset">↺ Reset</button>
+  <button id="btn-trail">Trails: ON</button>
+  <label>Speed <input type="range" id="speed" min="0.2" max="4" step="0.1" value="1"> <span id="spv">1.0×</span></label>
+  <label>G <input type="range" id="grav" min="100" max="2000" step="50" value="600"> <span id="gv">600</span></label>
+</div>
+<div id="info">Bodies: <span id="nb">0</span> · F = G·m₁·m₂ / r² computed every frame</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+let bodies = [], paused = false, showTrail = true, G = 600, speedMult = 1;
+const COLORS = ['#4af','#fa4','#f4a','#4fa','#a4f','#f44','#4ff','#ff4','#af4'];
+const TRAIL_LEN = 200;
+function makeStar(x, y, vx, vy, mass, color) {
+  return { x, y, vx, vy, mass, color, trail: [], r: Math.cbrt(mass) * 1.5 };
+}
+function spawnDefault() {
+  bodies = [];
+  const cx = W/2, cy = H/2;
+  bodies.push(makeStar(cx, cy, 0, 0, 9000, '#ffe08a'));
+  const orbits = [
+    {r:90,  m:120, c:'#4af'},
+    {r:145, m:200, c:'#4fa'},
+    {r:205, m:80,  c:'#f4a'},
+    {r:270, m:300, c:'#a4f'},
+  ];
+  orbits.forEach(o => {
+    const angle = Math.random() * Math.PI * 2;
+    const x = cx + Math.cos(angle) * o.r;
+    const y = cy + Math.sin(angle) * o.r;
+    const speed = Math.sqrt(G * 9000 / o.r);
+    bodies.push(makeStar(x, y, -Math.sin(angle)*speed, Math.cos(angle)*speed, o.m, o.c));
+  });
+}
+spawnDefault();
+let bgStars = [];
+for(let i = 0; i < 200; i++) bgStars.push({x: Math.random()*W, y: Math.random()*H, b: Math.random()});
+let lastTime = null;
+function step(ts) {
+  if (!lastTime) lastTime = ts;
+  let dt = Math.min((ts - lastTime) / 1000, 0.03) * speedMult;
+  lastTime = ts;
+  if (!paused) {
+    for (let i = 0; i < bodies.length; i++) {
+      bodies[i].ax = 0; bodies[i].ay = 0;
+      for (let j = 0; j < bodies.length; j++) {
+        if (i === j) continue;
+        const dx = bodies[j].x - bodies[i].x;
+        const dy = bodies[j].y - bodies[i].y;
+        const d2 = dx*dx + dy*dy;
+        const d = Math.sqrt(d2);
+        if (d < bodies[i].r + bodies[j].r) continue;
+        const f = G * bodies[j].mass / (d2 + 80);
+        bodies[i].ax += f * dx / d;
+        bodies[i].ay += f * dy / d;
+      }
+    }
+    bodies.forEach(b => {
+      b.vx += b.ax * dt;
+      b.vy += b.ay * dt;
+      b.x  += b.vx * dt;
+      b.y  += b.vy * dt;
+      b.trail.push({x: b.x, y: b.y});
+      if (b.trail.length > TRAIL_LEN) b.trail.shift();
+    });
+    bodies = bodies.filter((b, i) => i === 0 || (b.x > -W && b.x < W*2 && b.y > -H && b.y < H*2));
+    document.getElementById('nb').textContent = bodies.length;
+  }
+  if (showTrail) {
+    ctx.fillStyle = 'rgba(2,6,16,0.16)';
+  } else {
+    ctx.fillStyle = '#020610';
+  }
+  ctx.fillRect(0, 0, W, H);
+  bgStars.forEach(s => {
+    const a = 0.15 + 0.25 * Math.sin(ts * 0.0008 + s.b * 9);
+    ctx.fillStyle = `rgba(190,210,255,${a})`;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 0.8, 0, Math.PI*2); ctx.fill();
+  });
+  if (showTrail) {
+    bodies.forEach(b => {
+      if (b.trail.length < 2) return;
+      for (let i = 1; i < b.trail.length; i++) {
+        const a = (i / b.trail.length) * 0.75;
+        ctx.beginPath();
+        ctx.strokeStyle = b.color + Math.floor(a * 255).toString(16).padStart(2, '0');
+        ctx.lineWidth = 0.7 + a * 1.5;
+        ctx.moveTo(b.trail[i-1].x, b.trail[i-1].y);
+        ctx.lineTo(b.trail[i].x,   b.trail[i].y);
+        ctx.stroke();
+      }
+    });
+  }
+  bodies.forEach(b => {
+    for (let g = 4; g > 0; g--) {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r + g * 3.5, 0, Math.PI*2);
+      ctx.fillStyle = b.color + ['18','11','09','05'][g-1];
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.35, b.r * 0.38, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fill();
+    if (b.mass > 500) {
+      ctx.fillStyle = 'rgba(255,240,150,0.6)';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('M=' + Math.round(b.mass), b.x, b.y - b.r - 5);
+    }
+  });
+  requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (W / rect.width);
+  const my = (e.clientY - rect.top)  * (H / rect.height);
+  let nearest = bodies[0], minD = Infinity;
+  bodies.forEach(b => { const d = Math.hypot(b.x-mx, b.y-my); if(d<minD){minD=d;nearest=b;} });
+  const dx = nearest.x - mx, dy = nearest.y - my;
+  const d = Math.hypot(dx, dy) || 1;
+  const speed = Math.sqrt(G * nearest.mass / d) * 0.88;
+  const col = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const mass = 60 + Math.random() * 200;
+  bodies.push(makeStar(mx, my, -(dy/d)*speed + nearest.vx, (dx/d)*speed + nearest.vy, mass, col));
+});
+document.getElementById('btn-pause').onclick = function() {
+  paused = !paused; lastTime = null;
+  this.textContent = paused ? '▶ Play' : '⏸ Pause';
+};
+document.getElementById('btn-reset').onclick = () => spawnDefault();
+document.getElementById('btn-trail').onclick = function() {
+  showTrail = !showTrail;
+  this.textContent = 'Trails: ' + (showTrail ? 'ON' : 'OFF');
+};
+document.getElementById('speed').oninput = function() {
+  speedMult = parseFloat(this.value);
+  document.getElementById('spv').textContent = speedMult.toFixed(1) + '×';
+};
+document.getElementById('grav').oninput = function() {
+  G = parseInt(this.value);
+  document.getElementById('gv').textContent = G;
+};
+</script>
 </body>
 </html>

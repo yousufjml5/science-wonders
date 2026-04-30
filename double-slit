@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Double-Slit Quantum Experiment — Science Wonders</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #010409;
+  --bg2:     #080f1e;
+  --bg3:     #0c1830;
+  --border:  #152035;
+  --border2: #1e3050;
+  --text:    #b8ceec;
+  --text2:   #5878a0;
+  --text3:   #3a5070;
+  --accent:  #3a8fff;
+  --gold:    #f0c060;
+  --gold2:   #ffe8a0;
+  --cyan:    #20d0ff;
+  --red:     #ff4f60;
+}
+body { background:var(--bg); color:var(--text); font-family:'Georgia','Times New Roman',serif; line-height:1.6; min-height:100vh; }
+
+header { display:flex; align-items:center; gap:20px; padding:13px 28px; border-bottom:1px solid var(--border); background:rgba(1,4,9,0.96); position:sticky; top:0; z-index:10; }
+.logo { font-family:monospace; font-size:11px; letter-spacing:5px; color:var(--gold); text-transform:uppercase; }
+.logo span { color:var(--text2); }
+.page-subtitle { font-family:monospace; font-size:11px; color:var(--text2); border-left:1px solid var(--border2); padding-left:20px; letter-spacing:2px; }
+
+.canvas-wrap { position:relative; max-width:960px; margin:20px auto 0; padding:0 20px; }
+canvas { display:block; width:100%; background:#010610; border-radius:12px; border:1px solid var(--border); cursor:default; }
+.canvas-overlay { position:absolute; font-family:monospace; font-size:10px; background:rgba(1,6,16,0.88); padding:4px 10px; border-radius:4px; pointer-events:none; letter-spacing:1px; transition:color 0.3s; }
+.badge-tl { top:10px; left:30px; }
+.badge-tr { top:10px; right:30px; color:var(--text2); }
+
+.panels { max-width:960px; margin:14px auto 0; display:grid; grid-template-columns:330px 1fr; gap:12px; padding:0 20px; }
+@media(max-width:720px){ .panels{grid-template-columns:1fr;} }
+
+.panel { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:18px; }
+.panel-title { font-family:monospace; font-size:9px; letter-spacing:4px; color:var(--text2); text-transform:uppercase; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+
+.btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+button { font-family:monospace; font-size:11px; padding:5px 12px; background:transparent; border:1px solid var(--border2); border-radius:5px; color:var(--text2); cursor:pointer; transition:all .15s; letter-spacing:.5px; }
+button:hover { background:var(--bg3); color:var(--text); border-color:var(--accent); }
+button.q-on { border-color:var(--cyan); color:var(--cyan); }
+button.c-on { border-color:var(--red); color:var(--red); }
+button.lit  { border-color:var(--accent); color:var(--accent); }
+
+.mode-bar { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:7px; border:1px solid; margin-bottom:14px; font-family:monospace; font-size:11px; transition:all .3s; }
+.mode-bar.q { border-color:rgba(32,208,255,.4); background:rgba(32,208,255,.05); color:var(--cyan); }
+.mode-bar.c { border-color:rgba(255,79,96,.4);  background:rgba(255,79,96,.05);  color:var(--red); }
+.mdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+.param { margin-bottom:14px; }
+.param-row { display:flex; justify-content:space-between; align-items:baseline; font-family:monospace; font-size:11px; color:var(--text2); margin-bottom:4px; }
+.param-val { color:var(--gold); font-size:12px; }
+.param-sub { font-family:monospace; font-size:10px; color:var(--text3); margin-top:3px; }
+input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer; }
+
+.fbox { background:var(--bg3); border:1px solid var(--border2); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:12px 16px; margin-top:14px; font-family:monospace; line-height:2.1; }
+.fbox .fl { font-size:9px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-top:6px; }
+.fbox .fe { font-size:12px; color:var(--gold2); }
+.fbox .gc { font-size:10px; color:var(--text3); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
+
+.rtable { width:100%; border-collapse:collapse; font-family:monospace; font-size:11px; }
+.rtable th { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); font-weight:normal; text-align:left; padding:4px 8px; border-bottom:1px solid var(--border); }
+.rtable td { padding:5px 8px; color:var(--text); vertical-align:middle; }
+.rtable td:first-child { color:var(--text2); }
+.rtable td:nth-child(2) { color:var(--gold2); }
+.rtable td:nth-child(3) { color:var(--cyan); }
+.rtable td:nth-child(4) { color:var(--text3); font-size:10px; }
+.rtable tbody tr:hover td { background:rgba(58,143,255,.04); }
+
+.theory-wrap { max-width:960px; margin:20px auto 0; padding:0 20px 60px; }
+.theory { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:30px 36px; }
+.theory-hdr { font-family:monospace; font-size:9px; letter-spacing:5px; color:var(--text2); text-transform:uppercase; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.theory h3 { font-family:monospace; font-size:11px; font-weight:normal; color:var(--gold); letter-spacing:1.5px; text-transform:uppercase; margin:26px 0 10px; }
+.theory h3:first-of-type { margin-top:0; }
+.theory p { font-size:14px; color:var(--text2); margin-bottom:10px; line-height:1.85; }
+.theory .eq { font-family:monospace; font-size:13px; background:var(--bg3); border-left:3px solid var(--gold); padding:12px 20px; margin:14px 0; border-radius:0 8px 8px 0; color:var(--gold2); }
+.theory .eq .vars { font-size:11px; color:var(--text3); margin-top:6px; line-height:1.8; }
+.qbox { background:rgba(32,208,255,.04); border:1px solid rgba(32,208,255,.18); border-radius:8px; padding:14px 18px; margin:20px 0; font-family:monospace; font-size:12px; color:#7ae4ff; line-height:1.9; }
+.qbox strong { color:var(--cyan); }
+.utab { width:100%; border-collapse:collapse; font-family:monospace; font-size:12px; margin-top:10px; }
+.utab td { padding:6px 12px; border-bottom:1px solid var(--border); color:var(--text2); }
+.utab td:first-child { color:var(--gold2); width:230px; }
+.utab tr:last-child td { border-bottom:none; }
+footer { border-top:1px solid var(--border); padding:16px 28px; text-align:center; font-family:monospace; font-size:10px; color:var(--text3); letter-spacing:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⭐ Science<span> Wonders</span></div>
+  <div class="page-subtitle">Double-Slit Quantum Experiment</div>
+</header>
+
+<div class="canvas-wrap">
+  <canvas id="c" height="440"></canvas>
+  <div class="canvas-overlay badge-tl" id="badge-mode" style="color:var(--cyan)">⚛ QUANTUM MODE — Interference ON</div>
+  <div class="canvas-overlay badge-tr" id="badge-hits">Particles: 0</div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <div class="panel-title">Controls &amp; Parameters</div>
+
+    <div class="mode-bar q" id="mode-bar">
+      <div class="mdot" id="mdot" style="background:var(--cyan)"></div>
+      <span id="mode-text">Quantum — wave interference active</span>
+    </div>
+
+    <div class="btn-row">
+      <button id="btn-q" class="q-on">⚛ Quantum</button>
+      <button id="btn-c">⚠ Classical</button>
+      <button id="btn-reset">↺ Reset</button>
+      <button id="btn-pause">⏸ Pause</button>
+    </div>
+
+    <div class="param">
+      <div class="param-row"><span>Wavelength λ</span><span class="param-val" id="lv">15 nm</span></div>
+      <input type="range" id="sl-l" min="8" max="35" step="1" value="15">
+      <div class="param-sub" id="lsub">Photon: 82.7 eV (EUV) · Electron: 6.7 meV</div>
+    </div>
+
+    <div class="param">
+      <div class="param-row"><span>Slit separation d</span><span class="param-val" id="dv">55 nm</span></div>
+      <input type="range" id="sl-d" min="20" max="100" step="1" value="55">
+      <div class="param-sub" id="dsub">Bright fringes: m = 0, ±1, ±2, ±3</div>
+    </div>
+
+    <div class="param">
+      <div class="param-row"><span>Slit width a</span><span class="param-val" id="av">10 nm</span></div>
+      <input type="range" id="sl-a" min="3" max="28" step="1" value="10">
+      <div class="param-sub">Wider slit → narrower diffraction envelope</div>
+    </div>
+
+    <div class="param">
+      <div class="param-row"><span>Fire rate</span><span class="param-val" id="rv">4 /s</span></div>
+      <input type="range" id="sl-r" min="1" max="30" step="1" value="4">
+      <div class="param-sub">Particles per second (one at a time in quantum mode)</div>
+    </div>
+
+    <div class="fbox">
+      <div class="fl">Constructive interference (bright fringes)</div>
+      <div class="fe">d · sin θ = m · λ &nbsp;&nbsp;(m = 0, ±1, ±2 ...)</div>
+      <div class="fl">Destructive interference (dark fringes)</div>
+      <div class="fe">d · sin θ = (m + ½) · λ</div>
+      <div class="fl">Fringe spacing (small-angle approximation)</div>
+      <div class="fe">Δy = λ · L / d</div>
+      <div class="fl">Intensity pattern</div>
+      <div class="fe">I ∝ cos²(πd sinθ/λ) · sinc²(πa sinθ/λ)</div>
+      <div class="gc">λ = wavelength · d = slit separation · a = slit width<br>L = screen distance · m = fringe order (integer)</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Live Physics Readout</div>
+    <table class="rtable">
+      <thead><tr><th>Quantity</th><th>Symbol</th><th>Value</th><th>Formula / Note</th></tr></thead>
+      <tbody id="readout"></tbody>
+    </table>
+    <div style="margin-top:12px;font-family:monospace;font-size:10px;color:var(--text3);line-height:1.9;">
+      Scale: 1 sim pixel = 1 nm · Values computed in real SI units<br>
+      Yellow tick marks on screen = predicted bright fringe positions<br>
+      Switch modes to see how observation destroys the pattern
+    </div>
+  </div>
+</div>
+
+<div class="theory-wrap"><div class="theory">
+  <div class="theory-hdr">Theory — What Is Happening Here?</div>
+
+  <h3>The Double-Slit Experiment</h3>
+  <p>First performed by Thomas Young with light in 1801, this experiment became one of the most celebrated in physics when it was repeated with single electrons. A stream of quantum particles — photons, electrons, even entire molecules — is fired at a barrier with two narrow slits. Instead of forming two bands on the detector (as classical bullets would), the particles produce an <em>interference pattern</em> of alternating bright and dark fringes.</p>
+
+  <h3>Constructive and Destructive Interference</h3>
+  <p>Each slit acts as a new wave source. Where the wavefronts from both slits arrive <em>in phase</em> (crest meets crest), they reinforce — a bright fringe. Where they arrive <em>out of phase</em> (crest meets trough), they cancel — a dark fringe.</p>
+  <div class="eq">d · sin θ = m · λ &nbsp;&nbsp;&nbsp;(bright fringe at angle θ)
+    <div class="vars">d = slit separation · θ = angle from the central axis · λ = wavelength · m = 0, ±1, ±2 ... (fringe order)<br>m=0 → central bright spot · m=±1 → first fringes on either side · and so on</div>
+  </div>
+  <div class="eq">Δy = λ · L / d &nbsp;&nbsp;&nbsp;(fringe spacing on screen)
+    <div class="vars">L = distance from slits to screen · Larger d → fringes closer together · Larger λ → fringes spread further apart</div>
+  </div>
+  <p>The full intensity pattern also includes a single-slit diffraction envelope from each slit's finite width <em>a</em>, which modulates the fringe heights — fringes near the edge of the envelope are dimmer than the central ones.</p>
+  <div class="eq">I(θ) ∝ cos²(πd sinθ/λ) × [sin(πa sinθ/λ) / (πa sinθ/λ)]²
+    <div class="vars">First term: double-slit interference · Second term (sinc²): single-slit diffraction envelope<br>Together they predict the exact brightness of each fringe</div>
+  </div>
+
+  <h3>The Quantum Mystery: One Particle at a Time</h3>
+  <div class="qbox">
+    <strong>Key experiment (Tonomura et al., 1989):</strong> Single electrons were fired one at a time through a double slit — so slowly that no two electrons were ever in the apparatus simultaneously. Each electron hit a single pinpoint on the detector. Yet after accumulating ~70,000 electrons, the interference pattern emerged perfectly. Each particle appears to travel through <em>both slits at once</em> as a probability wave, interfering with itself, then collapsing to a point upon detection.
+  </div>
+  <p>In this simulation, <strong>Quantum mode</strong> fires particles whose landing positions are sampled from the quantum probability distribution |ψ|² = I(θ). Each particle hits one random spot — you cannot predict which — but over many particles the interference pattern is revealed. This is the central mystery of quantum mechanics.</p>
+
+  <h3>Classical Mode: The "Which-Path" Detector</h3>
+  <p>Switch to <strong>Classical mode</strong>. Now the pattern becomes two blobs with no fringes. This represents what happens when a detector is placed at the slits to observe which slit the particle passes through — so-called "which-path information." The moment you know which slit was used, the quantum superposition collapses. The interference disappears. The act of observation physically alters the outcome. This is not a flaw in our instruments; it is a fundamental law of nature described by the uncertainty principle.</p>
+
+  <h3>The de Broglie Wavelength</h3>
+  <p>Louis de Broglie (1924) proposed that all matter has an associated wavelength. This explains why the experiment works for particles, not just light.</p>
+  <div class="eq">λ = h / p = h / √(2mE)
+    <div class="vars">h = 6.626 × 10⁻³⁴ J·s (Planck's constant) · p = momentum · m = particle mass · E = kinetic energy<br>For electrons: λ (nm) ≈ 1.226 / √V where V = accelerating voltage in volts<br>For photons: E = hc/λ, so λ (nm) = 1240 / E (eV)</div>
+  </div>
+  <p>This wavelength must be comparable to the slit size d for interference to be visible. A baseball has λ ≈ 10⁻³⁴ m — far smaller than any physical slit, which is why we never see baseballs interfere with themselves. Electrons and photons at nanometre scales do.</p>
+
+  <table class="utab">
+    <tr><td>h (Planck's constant)</td><td>= 6.626 × 10⁻³⁴ J·s</td></tr>
+    <tr><td>mₑ (electron mass)</td><td>= 9.109 × 10⁻³¹ kg</td></tr>
+    <tr><td>c (speed of light)</td><td>= 2.998 × 10⁸ m/s</td></tr>
+    <tr><td>1 eV</td><td>= 1.602 × 10⁻¹⁹ J</td></tr>
+    <tr><td>1 nm</td><td>= 10⁻⁹ m = 10 Å (ångström)</td></tr>
+    <tr><td>Simulation scale</td><td>1 pixel = 1 nm</td></tr>
+  </table>
+</div></div>
+
+<footer>SCIENCE WONDERS &nbsp;·&nbsp; OPEN-SOURCE EDUCATIONAL PHYSICS SIMULATIONS</footer>
+
+<script>
+// ── Physical constants ───────────────────────────────────────────────────────
+const H_PL  = 6.626e-34;   // Planck J·s
+const M_E   = 9.109e-31;   // electron mass kg
+const C_LT  = 2.998e8;     // speed of light m/s
+const EV_J  = 1.602e-19;   // 1 eV in J
+const PX_M  = 1e-9;        // 1 sim pixel = 1 nm
+
+// ── Simulation geometry (sim pixels) ────────────────────────────────────────
+const SIM_W  = 420, SIM_H = 256;
+const SRC_X  = 16;
+const BAR_X  = 128;   // barrier left edge
+const BAR_W  = 11;    // barrier thickness
+const SCR_X  = 370;   // screen left edge
+const CY     = SIM_H >> 1;
+
+// ── Wave / slit parameters ───────────────────────────────────────────────────
+let lam = 15, d = 55, a = 10;
+let qMode = true, paused = false, fireRate = 4;
+
+// ── Precomputed wave arrays ──────────────────────────────────────────────────
+let S0, C0, D0, S1, C1, D1;
+const N = SIM_W * SIM_H;
+
+function recompute() {
+  S0 = new Float32Array(N); C0 = new Float32Array(N); D0 = new Float32Array(N);
+  S1 = new Float32Array(N); C1 = new Float32Array(N); D1 = new Float32Array(N);
+  const k  = (2 * Math.PI) / lam;
+  const sx = BAR_X + BAR_W;
+  const y0 = CY - d * 0.5;
+  const y1 = CY + d * 0.5;
+  const ph = k * sx; // phase offset to match incoming plane wave
+  for (let y = 0; y < SIM_H; y++) {
+    for (let x = sx; x < SIM_W; x++) {
+      const i = y * SIM_W + x;
+      const dx = x - sx;
+      const r0 = Math.sqrt(dx*dx + (y-y0)*(y-y0)) + .5;
+      const r1 = Math.sqrt(dx*dx + (y-y1)*(y-y1)) + .5;
+      const kr0 = k*r0 + ph, kr1 = k*r1 + ph;
+      S0[i] = Math.sin(kr0); C0[i] = Math.cos(kr0);
+      S1[i] = Math.sin(kr1); C1[i] = Math.cos(kr1);
+      D0[i] = 1 / Math.sqrt(r0*.05 + 1);
+      D1[i] = 1 / Math.sqrt(r1*.05 + 1);
+    }
+  }
+  rebuildCDF();
+}
+
+// ── Intensity & CDF sampling ─────────────────────────────────────────────────
+let cdf = new Float32Array(SIM_H);
+const L_SIM = SCR_X - BAR_X - BAR_W;
+
+function getIntensity(y) {
+  const dy = y - CY;
+  const r  = Math.sqrt(dy*dy + L_SIM*L_SIM);
+  const st = dy / r;
+  if (qMode) {
+    const phD = Math.PI * d * st / lam;
+    const phA = Math.PI * a * st / lam;
+    const intf = Math.cos(phD) ** 2;
+    const sinc = phA === 0 ? 1 : Math.sin(phA) / phA;
+    return intf * sinc * sinc;
+  } else {
+    const dy0 = y - (CY - d*.5), dy1 = y - (CY + d*.5);
+    const f = (dyi) => {
+      const ri = Math.sqrt(dyi*dyi + L_SIM*L_SIM);
+      const si = dyi/ri;
+      const phi = Math.PI*a*si/lam;
+      return phi === 0 ? 1 : (Math.sin(phi)/phi)**2;
+    };
+    return .5*(f(dy0) + f(dy1));
+  }
+}
+
+function rebuildCDF() {
+  let s = 0;
+  for (let y = 0; y < SIM_H; y++) { s += getIntensity(y); cdf[y] = s; }
+  for (let y = 0; y < SIM_H; y++) cdf[y] /= s;
+}
+
+function sampleY() {
+  const r = Math.random();
+  let lo=0, hi=SIM_H-1;
+  while(lo<hi){ const m=(lo+hi)>>1; if(cdf[m]<r) lo=m+1; else hi=m; }
+  return lo + Math.random() - .5;
+}
+
+// ── Canvas ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+let W, H, sX, sY;
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  W = canvas.width = Math.round(r.width);
+  H = canvas.height = 440;
+  sX = W / SIM_W; sY = H / SIM_H;
+}
+resize(); window.addEventListener('resize', resize);
+
+const off = document.createElement('canvas');
+off.width = SIM_W; off.height = SIM_H;
+const octx = off.getContext('2d');
+const imd  = octx.createImageData(SIM_W, SIM_H);
+const px   = imd.data;
+
+// Screen hits
+const hits = new Float32Array(SIM_H);
+let nHits = 0, maxH = 0;
+function addHit(y) {
+  const yi = Math.round(y);
+  if (yi>=0 && yi<SIM_H) { hits[yi]++; nHits++; if(hits[yi]>maxH) maxH=hits[yi]; }
+}
+
+// ── Particles ────────────────────────────────────────────────────────────────
+const parts = [];
+let fireAcc = 0;
+
+function firePart() {
+  const ty = sampleY();
+  const sy = (Math.random()<.5 ? CY-d*.5 : CY+d*.5) + (Math.random()-.5)*a;
+  parts.push({x: SRC_X, y: CY, sy, ty, ph: 0});
+}
+
+// ── Render wave field ────────────────────────────────────────────────────────
+function renderField(t) {
+  const k = (2*Math.PI)/lam;
+  const om = Math.PI*3; // visual frequency
+  const ct = Math.cos(om*t), st_ = Math.sin(om*t);
+  const y0 = CY - d*.5, y1 = CY + d*.5;
+  const bxe = BAR_X + BAR_W;
+
+  for (let y=0; y<SIM_H; y++) {
+    for (let x=0; x<SIM_W; x++) {
+      const i = y*SIM_W+x, idx=i<<2;
+      let r,g,b;
+
+      if (x < BAR_X) {
+        // Incoming plane wave
+        const ps = Math.sin(k*x - om*t);
+        const u = (ps+1)*.5;
+        r = u*8|0; g = (20+u*100)|0; b = (60+u*155)|0;
+
+      } else if (x < bxe) {
+        // Barrier
+        const in0 = Math.abs(y-y0) < a*.5;
+        const in1 = Math.abs(y-y1) < a*.5;
+        if (in0||in1) {
+          // Slit gap — wave passing through
+          const ps = Math.sin(k*x - om*t);
+          const u = (ps+1)*.5;
+          r=(u*15)|0; g=(90+u*110)|0; b=(160+u*95)|0;
+        } else {
+          r=50; g=58; b=65;
+        }
+
+      } else if (x < SCR_X) {
+        // Interference / diffraction field
+        if (qMode) {
+          let ps = .5*(D0[i]*(S0[i]*ct-C0[i]*st_) + D1[i]*(S1[i]*ct-C1[i]*st_));
+          if (ps>=0){ r=(ps*65)|0; g=(ps*210)|0; b=(30+ps*225)|0; }
+          else { const u=-ps; r=(u*140)|0; g=(u*20)|0; b=(30+u*185)|0; }
+        } else {
+          // Classical: show incoherent sum (no dark fringes)
+          const p0=Math.abs(.5*D0[i]*(S0[i]*ct-C0[i]*st_));
+          const p1=Math.abs(.5*D1[i]*(S1[i]*ct-C1[i]*st_));
+          const ps=p0+p1;
+          r=(ps*180)|0; g=(ps*110)|0; b=(ps*20)|0;
+        }
+
+      } else {
+        r=4; g=4; b=7;
+      }
+
+      px[idx]=r; px[idx+1]=g; px[idx+2]=b; px[idx+3]=255;
+    }
+  }
+  octx.putImageData(imd,0,0);
+  ctx.drawImage(off,0,0,W,H);
+}
+
+// ── Render accumulated screen hits ───────────────────────────────────────────
+function renderScreen() {
+  if (!maxH) return;
+  const sx = SCR_X*sX, sw = (SIM_W-SCR_X)*sX;
+  // Faint theoretical curve
+  for (let y=0; y<SIM_H; y++) {
+    const I = getIntensity(y);
+    ctx.fillStyle = qMode
+      ? `rgba(32,208,255,${(I*.12).toFixed(3)})`
+      : `rgba(255,160,60,${(I*.12).toFixed(3)})`;
+    ctx.fillRect(sx, y*sY, sw*I, Math.max(1,sY));
+  }
+  // Accumulated hits
+  for (let y=0; y<SIM_H; y++) {
+    if (!hits[y]) continue;
+    const frac = hits[y]/maxH;
+    ctx.fillStyle = qMode
+      ? `rgba(${(frac*60)|0},${(frac*215)|0},${(30+frac*225)|0},${.15+frac*.85})`
+      : `rgba(${(frac*230)|0},${(frac*140)|0},${(frac*30)|0},${.15+frac*.85})`;
+    ctx.fillRect(sx, y*sY, sw, Math.max(1.5,sY));
+  }
+}
+
+// ── Render fringe tick marks ─────────────────────────────────────────────────
+function renderTicks() {
+  const mMax = Math.floor(d/lam);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,220,80,.55)';
+  ctx.fillStyle   = 'rgba(255,220,80,.5)';
+  ctx.font = '8px monospace';
+  ctx.lineWidth = 1;
+  for (let m=-mMax; m<=mMax; m++) {
+    const sinT = m*lam/d;
+    if (Math.abs(sinT)>0.97) continue;
+    const tanT = sinT/Math.sqrt(1-sinT*sinT);
+    const yPx  = (CY + tanT*L_SIM)*sY;
+    const bx   = SCR_X*sX;
+    ctx.beginPath(); ctx.moveTo(bx,yPx); ctx.lineTo(bx-7,yPx); ctx.stroke();
+    if (Math.abs(m)<=3) {
+      ctx.textAlign='right';
+      ctx.fillText(`m=${m}`, bx-9, yPx+3);
+    }
+  }
+  ctx.restore();
+}
+
+// ── Render particles & labels ────────────────────────────────────────────────
+function renderParts() {
+  parts.forEach(p => {
+    const dx=p.x*sX, dy=p.y*sY;
+    ctx.beginPath(); ctx.arc(dx,dy,3.5,0,Math.PI*2);
+    ctx.fillStyle = qMode ? 'rgba(100,230,255,.9)' : 'rgba(255,170,60,.9)';
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(dx,dy,1.5,0,Math.PI*2);
+    ctx.fillStyle='#fff'; ctx.fill();
+  });
+}
+
+function renderLabels() {
+  ctx.save();
+  ctx.font='9px monospace'; ctx.fillStyle='rgba(180,200,230,.4)'; ctx.textAlign='center';
+  ctx.fillText('SOURCE', SRC_X*sX, 14);
+  ctx.fillText('SLITS', (BAR_X+BAR_W*.5)*sX, 14);
+  ctx.fillText('SCREEN', (SCR_X+(SIM_W-SCR_X)*.5)*sX, 14);
+  // Dashed lines from slits to screen
+  const y0=(CY-d*.5)*sY, y1=(CY+d*.5)*sY, bx=(BAR_X+BAR_W)*sX, sx2=SCR_X*sX;
+  ctx.strokeStyle='rgba(100,200,255,.2)'; ctx.lineWidth=.5;
+  ctx.setLineDash([4,5]);
+  [y0,y1].forEach(yy=>{ ctx.beginPath(); ctx.moveTo(bx,yy); ctx.lineTo(sx2,yy); ctx.stroke(); });
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// ── Main animation loop ──────────────────────────────────────────────────────
+let t=0, lastTs=null;
+
+function loop(ts) {
+  if(!lastTs) lastTs=ts;
+  const dt = Math.min((ts-lastTs)/1000,.033);
+  lastTs=ts;
+
+  if(!paused) {
+    t += dt;
+    fireAcc += dt;
+    while(fireAcc >= 1/fireRate) { firePart(); fireAcc -= 1/fireRate; }
+
+    const spd = 110; // sim px/s
+    for(let i=parts.length-1; i>=0; i--) {
+      const p=parts[i];
+      p.x += spd*dt;
+      if(p.ph===0) {
+        // Travel diagonally from source center toward assigned slit
+        const prog = (p.x - SRC_X) / Math.max(1, BAR_X - SRC_X);
+        p.y = CY + (p.sy - CY) * Math.min(1, prog);
+        if(p.x >= BAR_X + BAR_W) { p.ph=1; p.y=p.sy; }
+      }
+      if(p.ph===1) {
+        const prog=(p.x-(BAR_X+BAR_W))/L_SIM;
+        p.y=p.sy+(p.ty-p.sy)*Math.min(1,prog);
+      }
+      if(p.x>=SCR_X) { addHit(p.ty); parts.splice(i,1); }
+    }
+  }
+
+  renderField(t);
+  renderScreen();
+  renderTicks();
+  renderParts();
+  renderLabels();
+
+  document.getElementById('badge-hits').textContent = `Particles: ${nHits}`;
+  requestAnimationFrame(loop);
+}
+
+recompute();
+requestAnimationFrame(loop);
+
+// ── Live readout ─────────────────────────────────────────────────────────────
+function updateReadout() {
+  const lm = lam*PX_M, dm = d*PX_M, am = a*PX_M, Lm = L_SIM*PX_M;
+  const photEV  = (H_PL*C_LT/lm)/EV_J;
+  const elecJ   = H_PL*H_PL/(2*M_E*lm*lm);
+  const elecEV  = elecJ/EV_J;
+  const elecStr = elecEV<.001 ? (elecEV*1000).toFixed(2)+' meV' : elecEV.toFixed(3)+' eV';
+  const dyNm    = (lm*Lm/dm)/PX_M;
+  const mMax    = Math.floor(d/lam);
+  const mStr    = mMax>=3 ? `0, ±1, ±2, ±3` : `0, ±1${mMax>=2?', ±2':''}`;
+
+  const rows = [
+    ['Wavelength',      'λ',   `${lam} nm`,          'de Broglie: λ=h/p'],
+    ['Slit separation', 'd',   `${d} nm`,             ''],
+    ['Slit width',      'a',   `${a} nm`,             ''],
+    ['Screen distance', 'L',   `${L_SIM} nm`,         ''],
+    ['Fringe spacing',  'Δy',  `${dyNm.toFixed(1)} nm`, 'λL/d'],
+    ['Fringe orders',   'm',   mStr,                  'd·sinθ=mλ'],
+    ['Photon energy',   'E',   `${photEV.toFixed(1)} eV`, 'hc/λ'],
+    ['Electron energy', 'KE',  elecStr,               'h²/2mλ²'],
+    ['Particles fired', 'N',   `${nHits}`,            qMode?'Quantum':'Classical'],
+  ];
+  document.getElementById('readout').innerHTML = rows.map(([n,s,v,f])=>
+    `<tr><td>${n}</td><td>${s}</td><td>${v}</td><td>${f}</td></tr>`
+  ).join('');
+}
+setInterval(updateReadout, 380);
+
+// ── UI helpers ───────────────────────────────────────────────────────────────
+function setMode(q) {
+  qMode = q;
+  rebuildCDF();
+  const bm = document.getElementById('badge-mode');
+  const mb = document.getElementById('mode-bar');
+  const md = document.getElementById('mdot');
+  const mt = document.getElementById('mode-text');
+  if(q) {
+    bm.textContent='⚛ QUANTUM MODE — Interference ON'; bm.style.color='var(--cyan)';
+    mb.className='mode-bar q'; md.style.background='var(--cyan)';
+    mt.textContent='Quantum — wave interference active';
+    document.getElementById('btn-q').className='q-on';
+    document.getElementById('btn-c').className='';
+  } else {
+    bm.textContent='⚠ CLASSICAL MODE — Which-Path Detector ON'; bm.style.color='var(--red)';
+    mb.className='mode-bar c'; md.style.background='var(--red)';
+    mt.textContent='Classical — observation destroys interference';
+    document.getElementById('btn-q').className='';
+    document.getElementById('btn-c').className='c-on';
+  }
+}
+
+document.getElementById('btn-q').onclick    = () => setMode(true);
+document.getElementById('btn-c').onclick    = () => setMode(false);
+document.getElementById('btn-reset').onclick = () => { hits.fill(0); nHits=0; maxH=0; parts.length=0; };
+document.getElementById('btn-pause').onclick = function() {
+  paused=!paused; lastTs=null;
+  this.textContent=paused?'▶ Play':'⏸ Pause';
+  this.classList.toggle('lit',paused);
+};
+
+document.getElementById('sl-l').oninput = function() {
+  lam = +this.value;
+  document.getElementById('lv').textContent=lam+' nm';
+  const pe=(H_PL*C_LT/(lam*PX_M))/EV_J;
+  const ee=H_PL*H_PL/(2*M_E*(lam*PX_M)**2)/EV_J;
+  const es=ee<.001?(ee*1000).toFixed(2)+' meV':ee.toFixed(3)+' eV';
+  document.getElementById('lsub').textContent=`Photon: ${pe.toFixed(1)} eV · Electron: ${es}`;
+  recompute();
+};
+document.getElementById('sl-d').oninput = function() {
+  d=+this.value;
+  document.getElementById('dv').textContent=d+' nm';
+  const mM=Math.floor(d/lam);
+  document.getElementById('dsub').textContent=`Bright fringes: m = 0, ±1 ... ±${mM}`;
+  recompute();
+};
+document.getElementById('sl-a').oninput = function() {
+  a=+this.value; document.getElementById('av').textContent=a+' nm'; recompute();
+};
+document.getElementById('sl-r').oninput = function() {
+  fireRate=+this.value; document.getElementById('rv').textContent=fireRate+' /s';
+};
+</script>
+</body>
+</html>

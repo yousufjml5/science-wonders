@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-32ZMW31TWT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-32ZMW31TWT');
+    </script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Double Pendulum — Science Wonders</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#010409;--bg2:#080f1e;--bg3:#0c1830;
+  --border:#152035;--border2:#1e3050;
+  --text:#b8ceec;--text2:#5878a0;--text3:#3a5070;
+  --accent:#3a8fff;--gold:#f0c060;--gold2:#ffe8a0;
+  --cyan:#20d0ff;--red:#ff4f60;--violet:#c060ff;--green:#40ffaa;
+  --pink:#ff6090;
+}
+body{background:var(--bg);color:var(--text);font-family:'Georgia','Times New Roman',serif;line-height:1.6;min-height:100vh;}
+
+header{display:flex;align-items:center;gap:20px;padding:13px 28px;border-bottom:1px solid var(--border);background:rgba(1,4,9,.97);position:sticky;top:0;z-index:10;}
+.logo{font-family:monospace;font-size:11px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;}
+.logo span{color:var(--text2);}
+.page-subtitle{font-family:monospace;font-size:11px;color:var(--text2);border-left:1px solid var(--border2);padding-left:20px;letter-spacing:2px;}
+
+.canvas-wrap{position:relative;max-width:960px;margin:20px auto 0;padding:0 20px;}
+canvas{display:block;width:100%;border-radius:12px;border:1px solid var(--border);cursor:crosshair;background:#010812;}
+.badge{position:absolute;font-family:monospace;font-size:10px;background:rgba(1,6,16,.9);padding:4px 10px;border-radius:4px;pointer-events:none;letter-spacing:1px;}
+.badge-tl{top:10px;left:30px;color:var(--gold);}
+.badge-tr{top:10px;right:30px;color:var(--text2);}
+.badge-bl{bottom:14px;left:30px;color:var(--text3);}
+
+.panels{max-width:960px;margin:14px auto 0;display:grid;grid-template-columns:330px 1fr;gap:12px;padding:0 20px;}
+@media(max-width:720px){.panels{grid-template-columns:1fr;}}
+
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.panel-title{font-family:monospace;font-size:9px;letter-spacing:4px;color:var(--text2);text-transform:uppercase;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+button{font-family:monospace;font-size:11px;padding:5px 12px;background:transparent;border:1px solid var(--border2);border-radius:5px;color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+button:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
+button.lit{border-color:var(--accent);color:var(--accent);}
+button.chaos-on{border-color:var(--pink);color:var(--pink);}
+
+.mode-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:7px;border:1px solid;margin-bottom:14px;font-family:monospace;font-size:11px;transition:all .3s;border-color:rgba(240,192,96,.35);background:rgba(240,192,96,.05);color:var(--gold);}
+.mdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--gold);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+.param{margin-bottom:14px;}
+.param-row{display:flex;justify-content:space-between;align-items:baseline;font-family:monospace;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.param-val{font-size:12px;font-weight:bold;}
+.param-sub{font-family:monospace;font-size:10px;color:var(--text3);margin-top:3px;}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
+
+.preset-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+.preset-row button{padding:6px 8px;font-size:10px;}
+
+.fbox{background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-family:monospace;line-height:2.1;}
+.fbox .fl{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.fbox .fe{font-size:11px;color:var(--gold2);}
+.fbox .gc{font-size:10px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+
+.rtable{width:100%;border-collapse:collapse;font-family:monospace;font-size:11px;}
+.rtable th{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:normal;text-align:left;padding:4px 8px;border-bottom:1px solid var(--border);}
+.rtable td{padding:5px 8px;color:var(--text);vertical-align:middle;}
+.rtable td:first-child{color:var(--text2);}
+.rtable tbody tr:hover td{background:rgba(58,143,255,.04);}
+
+.energy-bar-wrap{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.energy-row{display:flex;align-items:center;gap:8px;font-family:monospace;font-size:10px;margin-bottom:5px;}
+.energy-label{color:var(--text2);width:90px;}
+.energy-bar-bg{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.energy-bar{height:100%;border-radius:3px;transition:width .15s;}
+.energy-val{color:var(--text);width:55px;text-align:right;font-size:10px;}
+
+.phase-wrap{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.phase-title{font-family:monospace;font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+#phase-canvas{width:100%;height:160px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;}
+
+.theory-wrap{max-width:960px;margin:20px auto 0;padding:0 20px 60px;}
+.theory{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:30px 36px;}
+.theory-hdr{font-family:monospace;font-size:9px;letter-spacing:5px;color:var(--text2);text-transform:uppercase;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.theory h3{font-family:monospace;font-size:11px;font-weight:normal;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin:26px 0 10px;}
+.theory h3:first-of-type{margin-top:0;}
+.theory p{font-size:14px;color:var(--text2);margin-bottom:10px;line-height:1.85;}
+.theory em{color:var(--gold2);font-style:italic;}
+.theory strong{color:var(--text);}
+.theory .eq{font-family:monospace;font-size:12px;background:var(--bg3);border-left:3px solid var(--gold);padding:12px 20px;margin:14px 0;border-radius:0 8px 8px 0;color:var(--gold2);}
+.theory .eq .vars{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.8;}
+.highlight-box{border-radius:8px;padding:14px 18px;margin:16px 0;font-family:monospace;font-size:12px;line-height:1.9;}
+.hb-cyan{background:rgba(32,208,255,.04);border:1px solid rgba(32,208,255,.18);color:#7ae4ff;}
+.hb-red{background:rgba(255,79,96,.04);border:1px solid rgba(255,79,96,.2);color:#ff8898;}
+.hb-violet{background:rgba(192,96,255,.05);border:1px solid rgba(192,96,255,.2);color:#d090ff;}
+.hb-pink{background:rgba(255,96,144,.05);border:1px solid rgba(255,96,144,.22);color:#ffa0c0;}
+.utab{width:100%;border-collapse:collapse;font-family:monospace;font-size:12px;margin-top:10px;}
+.utab td{padding:6px 12px;border-bottom:1px solid var(--border);color:var(--text2);}
+.utab td:first-child{color:var(--gold2);width:240px;}
+.utab tr:last-child td{border-bottom:none;}
+footer{border-top:1px solid var(--border);padding:16px 28px;text-align:center;font-family:monospace;font-size:10px;color:var(--text3);letter-spacing:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⭐ Science<span> Wonders</span></div>
+  <div class="page-subtitle">Double Pendulum — Deterministic Chaos</div>
+</header>
+
+<div class="canvas-wrap">
+  <canvas id="c" height="500"></canvas>
+  <div class="badge badge-tl" id="badge-mode">⚛ CHAOS LIVE</div>
+  <div class="badge badge-tr" id="badge-time">t = 0.00 s</div>
+  <div class="badge badge-bl">Drag bobs to set position · Release to launch</div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <div class="panel-title">Controls &amp; Parameters</div>
+
+    <div class="mode-bar">
+      <div class="mdot"></div>
+      <span>Lagrangian dynamics · RK4 integrator</span>
+    </div>
+
+    <div class="btn-row">
+      <button id="btn-pause">⏸ Pause</button>
+      <button id="btn-reset">↺ Reset</button>
+      <button id="btn-trail">✦ Trail</button>
+      <button id="btn-chaos">⚡ Chaos Demo</button>
+    </div>
+
+    <div class="param-row" style="margin-bottom:6px;color:var(--text3);font-size:10px;letter-spacing:2px;">PRESETS</div>
+    <div class="preset-row">
+      <button data-preset="gentle">Gentle swing</button>
+      <button data-preset="chaotic">Full chaos</button>
+      <button data-preset="symmetric">Symmetric drop</button>
+      <button data-preset="extreme">Extreme energy</button>
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Length L₁ (upper)</span>
+        <span class="param-val" id="L1-v" style="color:var(--cyan)">1.00 m</span>
+      </div>
+      <input type="range" id="sl-L1" min="0.4" max="2.0" step="0.05" value="1.0">
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Length L₂ (lower)</span>
+        <span class="param-val" id="L2-v" style="color:var(--cyan)">1.00 m</span>
+      </div>
+      <input type="range" id="sl-L2" min="0.4" max="2.0" step="0.05" value="1.0">
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Mass m₁ (upper)</span>
+        <span class="param-val" id="m1-v" style="color:var(--violet)">1.00 kg</span>
+      </div>
+      <input type="range" id="sl-m1" min="0.2" max="5.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Mass m₂ (lower)</span>
+        <span class="param-val" id="m2-v" style="color:var(--violet)">1.00 kg</span>
+      </div>
+      <input type="range" id="sl-m2" min="0.2" max="5.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Gravity g</span>
+        <span class="param-val" id="g-v" style="color:var(--gold)">9.81 m/s²</span>
+      </div>
+      <input type="range" id="sl-g" min="1" max="25" step="0.1" value="9.81">
+      <div class="param-sub" id="g-sub">Earth gravity</div>
+    </div>
+
+    <div class="param">
+      <div class="param-row">
+        <span>Damping</span>
+        <span class="param-val" id="damp-v" style="color:var(--text)">0.00</span>
+      </div>
+      <input type="range" id="sl-damp" min="0" max="0.5" step="0.005" value="0">
+      <div class="param-sub">Air resistance / friction at pivot</div>
+    </div>
+
+    <div class="fbox">
+      <div class="fl">Lagrangian: L = T − V</div>
+      <div class="fe">L = ½(m₁+m₂)L₁²θ̇₁² + ½m₂L₂²θ̇₂²<br>&nbsp;&nbsp;&nbsp;+ m₂L₁L₂θ̇₁θ̇₂cos(θ₁−θ₂)<br>&nbsp;&nbsp;&nbsp;+ (m₁+m₂)gL₁cosθ₁ + m₂gL₂cosθ₂</div>
+      <div class="fl">Euler-Lagrange equations</div>
+      <div class="fe">d/dt(∂L/∂θ̇ᵢ) − ∂L/∂θᵢ = 0</div>
+      <div class="gc">Yields a coupled nonlinear ODE system. No closed-form solution exists — only numerical integration. We use RK4 at 1 kHz for stability.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Live Physics Readout</div>
+    <table class="rtable">
+      <thead><tr><th>Quantity</th><th>Symbol</th><th>Value</th><th>Note</th></tr></thead>
+      <tbody id="readout"></tbody>
+    </table>
+
+    <div class="energy-bar-wrap">
+      <div class="energy-row">
+        <div class="energy-label">Kinetic</div>
+        <div class="energy-bar-bg"><div class="energy-bar" id="ke-bar" style="background:linear-gradient(90deg,#3a8fff,#20d0ff);"></div></div>
+        <div class="energy-val" id="ke-val">0.0 J</div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-label">Potential</div>
+        <div class="energy-bar-bg"><div class="energy-bar" id="pe-bar" style="background:linear-gradient(90deg,#f0c060,#ffe8a0);"></div></div>
+        <div class="energy-val" id="pe-val">0.0 J</div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-label">Total (E)</div>
+        <div class="energy-bar-bg"><div class="energy-bar" id="te-bar" style="background:linear-gradient(90deg,#40ffaa,#20d0ff);width:100%;"></div></div>
+        <div class="energy-val" id="te-val">0.0 J</div>
+      </div>
+    </div>
+
+    <div class="phase-wrap">
+      <div class="phase-title">Phase Space — θ₁ vs θ̇₁</div>
+      <canvas id="phase-canvas" width="280" height="160"></canvas>
+    </div>
+
+    <div style="margin-top:12px;font-family:monospace;font-size:10px;color:var(--text3);line-height:1.9;">
+      Bob 1 (gold) = upper mass · Bob 2 (cyan) = lower<br>
+      Pink ghost = identical pendulum offset by 10⁻³ rad<br>
+      Phase space loops if periodic, fills space if chaotic
+    </div>
+  </div>
+</div>
+
+<div class="theory-wrap"><div class="theory">
+  <div class="theory-hdr">Theory — Why Is This Famously Chaotic?</div>
+
+  <h3>The Setup</h3>
+  <p>A double pendulum is two simple pendulums attached end-to-end: an upper rod of length L₁ with mass m₁, and a second rod of length L₂ hanging from it, ending in mass m₂. We track two angles, θ₁ and θ₂, measured from the vertical.</p>
+  <p>It looks innocent. It even <em>sounds</em> innocent — a system with just two degrees of freedom. But it is one of the simplest mechanical systems exhibiting <strong>deterministic chaos</strong>, and it has become the textbook icon of nonlinear dynamics.</p>
+
+  <h3>Lagrangian Mechanics</h3>
+  <p>Newton's F=ma is awkward here because the constraint forces (rod tensions) are messy. Instead we use the <em>Lagrangian formulation</em> — write down the kinetic energy T and potential energy V as functions of the angles and angular velocities, then apply the Euler-Lagrange equations.</p>
+  <div class="eq">T = ½(m₁+m₂)L₁²θ̇₁² + ½m₂L₂²θ̇₂² + m₂L₁L₂θ̇₁θ̇₂cos(θ₁−θ₂)
+    <div class="vars">Kinetic energy. Note the cross-term — the two pendulums are <em>coupled</em>. This is where the trouble starts.</div>
+  </div>
+  <div class="eq">V = −(m₁+m₂)gL₁cosθ₁ − m₂gL₂cosθ₂
+    <div class="vars">Potential energy, measured relative to the pivot. Lower bobs = lower V.</div>
+  </div>
+  <p>Applying d/dt(∂L/∂θ̇ᵢ) = ∂L/∂θᵢ and solving for the angular accelerations gives a pair of coupled, nonlinear, second-order ODEs. They contain trigonometric functions of (θ₁ − θ₂), products of velocities, and a denominator that can blow up. There is <em>no closed-form solution</em> in general.</p>
+
+  <h3>Sensitivity to Initial Conditions</h3>
+  <p>Try the <strong>Chaos Demo</strong> button. It launches a second, identical pendulum (the pink ghost) offset by just <strong>0.001 radians</strong> — about 0.06°, smaller than a typewriter's ink dot. For a few seconds the two pendulums move in lockstep. Then they begin to drift. Within ten or twenty seconds they are doing entirely different things.</p>
+  <div class="highlight-box hb-pink">
+    <strong>This is the signature of chaos:</strong> infinitesimal differences in initial conditions grow <em>exponentially</em> in time. The rate of growth is called the <strong>Lyapunov exponent</strong> λ. For a chaotic system, λ &gt; 0 and the separation grows like δ(t) ≈ δ₀ · e^(λt).<br><br>
+    For the double pendulum at moderate energy, λ ≈ 1–3 s⁻¹. After ~10 seconds, a 10⁻³ rad uncertainty grows to order 1 rad — full divergence. After 30 seconds, prediction is impossible no matter how precisely you measured the initial state.
+  </div>
+
+  <h3>Deterministic, but Unpredictable</h3>
+  <p>The equations are entirely <em>deterministic</em>. Given exact initial conditions, there is one and only one future. No randomness, no noise, no quantum fuzziness — just classical mechanics. And yet, the future is unpredictable in practice because we can never measure the present <em>exactly</em>.</p>
+  <p>This was the conceptual earthquake of the 1960s and 70s. Edward Lorenz famously discovered it in a weather model: rounding 0.506127 to 0.506 produced a completely different forecast. He coined the term "butterfly effect" — the flap of a butterfly's wings in Brazil setting off a tornado in Texas. The double pendulum is the same idea, distilled to a single tabletop demonstration.</p>
+
+  <h3>Phase Space and Strange Attractors</h3>
+  <p>The phase-space inset on the right plots θ₁ against its angular velocity θ̇₁. For a regular (non-chaotic) pendulum this would trace a closed loop — same state visited again and again. For a chaotic double pendulum, the trajectory <em>never closes</em> and never repeats, but stays bounded by a complex fractal region called a <strong>strange attractor</strong>.</p>
+  <div class="highlight-box hb-cyan">
+    <strong>Energy regimes:</strong><br>
+    <strong>Low energy</strong> (small swings, V well below 0): <em>quasi-periodic</em>. The pendulum behaves almost like two coupled normal-mode oscillators. Predictable, regular, not chaotic.<br>
+    <strong>Moderate energy</strong>: <em>mixed phase space</em>. Some regions are regular ("KAM tori"), others are chaotic. The trajectory may wander between them.<br>
+    <strong>High energy</strong> (full flips over the top): <em>fully chaotic</em>. The phase space portrait becomes a strange attractor.
+  </div>
+
+  <h3>Conservation Laws — A Sanity Check</h3>
+  <p>With no damping, total energy E = T + V must be exactly conserved. The energy bar in the readout is your numerical-accuracy meter: if it drifts noticeably, your integrator is failing. The classical Euler method drifts badly for this system. We use <strong>4th-order Runge-Kutta (RK4)</strong> at a 1 ms timestep, which keeps energy stable to ~0.01% even over long simulations.</p>
+  <div class="eq">RK4: y_{n+1} = y_n + (h/6)(k₁ + 2k₂ + 2k₃ + k₄)
+    <div class="vars">Four evaluations of the derivative per step. O(h⁵) local error vs O(h²) for Euler. Worth the extra cost for stiff nonlinear systems.</div>
+  </div>
+
+  <h3>Why It Matters</h3>
+  <div class="highlight-box hb-violet">
+    <strong>Weather forecasting:</strong> the atmosphere is a chaotic system with millions of degrees of freedom. The double pendulum explains why forecasts beyond ~10 days are fundamentally impossible.<br>
+    <strong>Planetary motion:</strong> the long-term stability of the solar system is a chaotic problem. Mercury's orbit has a small but nonzero chance of becoming unstable over billions of years.<br>
+    <strong>Population biology, neural dynamics, fluid turbulence, cardiac arrhythmia:</strong> all governed by chaotic nonlinear dynamics. The double pendulum is the simplest portal into this entire world.<br>
+    <strong>Pseudorandom number generation &amp; cryptography:</strong> chaotic maps are used to generate sequences that are deterministic but statistically random.
+  </div>
+
+  <table class="utab">
+    <tr><td>Degrees of freedom</td><td>2 (θ₁, θ₂)</td></tr>
+    <tr><td>Phase space dimension</td><td>4 (θ₁, θ₂, θ̇₁, θ̇₂)</td></tr>
+    <tr><td>Conserved quantities (no damping)</td><td>Total energy E only</td></tr>
+    <tr><td>Lyapunov exponent (typical)</td><td>λ ≈ 1–3 s⁻¹</td></tr>
+    <tr><td>Predictability horizon</td><td>~10–30 seconds (depends on precision)</td></tr>
+    <tr><td>Discovered by</td><td>Daniel Bernoulli (1733) — chaos understood much later (1970s)</td></tr>
+  </table>
+</div></div>
+
+<footer>SCIENCE WONDERS &nbsp;·&nbsp; OPEN-SOURCE EDUCATIONAL PHYSICS SIMULATIONS</footer>
+
+<script>
+// ── Constants & State ────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+const phaseCanvas = document.getElementById('phase-canvas');
+const pctx   = phaseCanvas.getContext('2d');
+
+let W, H;
+function resize() {
+  const r = canvas.getBoundingClientRect();
+  W = canvas.width  = Math.round(r.width);
+  H = canvas.height = 500;
+  const pr = phaseCanvas.getBoundingClientRect();
+  phaseCanvas.width = Math.round(pr.width);
+  phaseCanvas.height = 160;
+}
+resize(); window.addEventListener('resize', resize);
+
+// Physics parameters
+let L1 = 1.0, L2 = 1.0;       // m
+let m1 = 1.0, m2 = 1.0;       // kg
+let g  = 9.81;                // m/s²
+let damping = 0;              // angular drag
+
+// State [θ₁, θ̇₁, θ₂, θ̇₂]
+let s1 = [Math.PI * 0.6, 0, Math.PI * 0.5, 0];
+let s2 = null;  // ghost (chaos demo)
+let chaosOn = false;
+let trailOn = true;
+let paused = false;
+let simTime = 0;
+let lastTs = null;
+
+// Trails (recent positions of the lower bob)
+let trail1 = [];
+let trail2 = [];
+const TRAIL_MAX = 1500;
+
+// Phase space samples
+let phasePts = [];
+const PHASE_MAX = 4000;
+
+// Drag state
+let dragging = null;  // 'b1' | 'b2' | null
+
+// ── Kinematics: angle → pixel position ───────────────────────────────────────
+function pivotPos() { return { x: W/2, y: H * 0.30 }; }
+function bobPositions(state) {
+  const { x: px, y: py } = pivotPos();
+  const scale = Math.min(W, H) * 0.18; // px per meter
+  const x1 = px + L1 * scale * Math.sin(state[0]);
+  const y1 = py + L1 * scale * Math.cos(state[0]);
+  const x2 = x1 + L2 * scale * Math.sin(state[2]);
+  const y2 = y1 + L2 * scale * Math.cos(state[2]);
+  return { px, py, x1, y1, x2, y2, scale };
+}
+
+// ── Equations of motion (Lagrangian-derived) ─────────────────────────────────
+// State: [θ1, ω1, θ2, ω2]; returns derivatives.
+function deriv(s) {
+  const t1 = s[0], w1 = s[1], t2 = s[2], w2 = s[3];
+  const dt = t1 - t2;
+  const cosDt = Math.cos(dt), sinDt = Math.sin(dt);
+  const M = m1 + m2;
+
+  const denom1 = L1 * (M - m2 * cosDt * cosDt);
+  const denom2 = L2 * (M - m2 * cosDt * cosDt);
+
+  const a1 = (
+    -m2 * L1 * w1 * w1 * sinDt * cosDt
+    + m2 * g * Math.sin(t2) * cosDt
+    + m2 * L2 * w2 * w2 * sinDt
+    - M * g * Math.sin(t1)
+  ) / denom1;
+
+  const a2 = (
+    -m2 * L2 * w2 * w2 * sinDt * cosDt
+    + M * (g * Math.sin(t1) * cosDt - L1 * w1 * w1 * sinDt - g * Math.sin(t2))
+  ) / denom2;
+
+  // Damping (linear in angular velocity)
+  const a1d = a1 - damping * w1;
+  const a2d = a2 - damping * w2;
+
+  return [w1, a1d, w2, a2d];
+}
+
+// ── RK4 integrator ───────────────────────────────────────────────────────────
+function rk4Step(s, h) {
+  const k1 = deriv(s);
+  const s2 = s.map((v,i) => v + 0.5 * h * k1[i]);
+  const k2 = deriv(s2);
+  const s3 = s.map((v,i) => v + 0.5 * h * k2[i]);
+  const k3 = deriv(s3);
+  const s4 = s.map((v,i) => v + h * k3[i]);
+  const k4 = deriv(s4);
+  return s.map((v,i) => v + (h/6) * (k1[i] + 2*k2[i] + 2*k3[i] + k4[i]));
+}
+
+// Sub-stepped step: 1 ms internal substeps for stability
+function step(state, dt) {
+  const SUB = 1/1000;
+  let n = Math.max(1, Math.round(dt / SUB));
+  let h = dt / n;
+  let s = state;
+  for (let i = 0; i < n; i++) s = rk4Step(s, h);
+  return s;
+}
+
+// ── Energies ─────────────────────────────────────────────────────────────────
+function energies(state) {
+  const t1 = state[0], w1 = state[1], t2 = state[2], w2 = state[3];
+  // Velocities of bobs
+  const v1sq = (L1 * w1) ** 2;
+  const v2sq = (L1*w1)**2 + (L2*w2)**2 + 2*L1*L2*w1*w2*Math.cos(t1-t2);
+  const T = 0.5*m1*v1sq + 0.5*m2*v2sq;
+  // Heights below pivot positive → V negative
+  const y1 = -L1 * Math.cos(t1);
+  const y2 = y1 - L2 * Math.cos(t2);
+  const V = m1 * g * y1 + m2 * g * y2;
+  return { T, V, E: T + V };
+}
+
+// ── Drawing ──────────────────────────────────────────────────────────────────
+function clearTrails() { trail1 = []; trail2 = []; phasePts = []; }
+
+function drawTrail(arr, hue) {
+  if (!trailOn || arr.length < 2) return;
+  ctx.lineWidth = 1.5;
+  for (let i = 1; i < arr.length; i++) {
+    const a = (i / arr.length);
+    ctx.strokeStyle = `hsla(${hue},90%,65%,${(a*0.6).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.moveTo(arr[i-1].x, arr[i-1].y);
+    ctx.lineTo(arr[i].x, arr[i].y);
+    ctx.stroke();
+  }
+}
+
+function drawPendulum(state, opts) {
+  const { x1, y1, x2, y2, px, py } = bobPositions(state);
+  const { rodColor, bob1Color, bob2Color, alpha = 1, label1, label2 } = opts;
+
+  ctx.globalAlpha = alpha;
+
+  // Rods
+  ctx.strokeStyle = rodColor;
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+
+  // Bob 1
+  for (let g = 4; g > 0; g--) {
+    ctx.beginPath(); ctx.arc(x1, y1, 9 + g*3, 0, Math.PI*2);
+    ctx.fillStyle = bob1Color.replace(')', `,${(0.06 - g*0.012).toFixed(3)})`).replace('rgb','rgba');
+    ctx.fill();
+  }
+  const r1 = 6 + Math.sqrt(m1) * 4;
+  ctx.beginPath(); ctx.arc(x1, y1, r1, 0, Math.PI*2);
+  ctx.fillStyle = bob1Color; ctx.fill();
+  ctx.beginPath(); ctx.arc(x1 - r1*0.3, y1 - r1*0.3, r1*0.35, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fill();
+  if (label1) {
+    ctx.fillStyle = 'rgba(0,0,0,.7)';
+    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(label1, x1, y1 + 3);
+  }
+
+  // Bob 2
+  for (let g = 4; g > 0; g--) {
+    ctx.beginPath(); ctx.arc(x2, y2, 9 + g*3, 0, Math.PI*2);
+    ctx.fillStyle = bob2Color.replace(')', `,${(0.06 - g*0.012).toFixed(3)})`).replace('rgb','rgba');
+    ctx.fill();
+  }
+  const r2 = 6 + Math.sqrt(m2) * 4;
+  ctx.beginPath(); ctx.arc(x2, y2, r2, 0, Math.PI*2);
+  ctx.fillStyle = bob2Color; ctx.fill();
+  ctx.beginPath(); ctx.arc(x2 - r2*0.3, y2 - r2*0.3, r2*0.35, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fill();
+  if (label2) {
+    ctx.fillStyle = 'rgba(0,0,0,.7)';
+    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(label2, x2, y2 + 3);
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function render() {
+  // Background
+  ctx.fillStyle = '#010812';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid
+  ctx.strokeStyle = 'rgba(30,50,80,.3)';
+  ctx.lineWidth = .5;
+  for (let x = 0; x < W; x += 60) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 60) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Trails (lower bob path) — drawn first so pendulums sit on top
+  drawTrail(trail1, 195); // cyan-ish
+  if (chaosOn && s2) drawTrail(trail2, 330); // pink
+
+  // Pivot
+  const { x: px, y: py } = pivotPos();
+  ctx.fillStyle = 'rgba(180,200,255,.9)';
+  ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(180,200,255,.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI*2); ctx.stroke();
+
+  // Ceiling hatching
+  ctx.strokeStyle = 'rgba(180,200,255,.3)';
+  ctx.lineWidth = 1;
+  for (let i = -3; i <= 3; i++) {
+    ctx.beginPath();
+    ctx.moveTo(px + i*8 - 12, py - 14);
+    ctx.lineTo(px + i*8, py - 6);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.moveTo(px - 28, py - 6); ctx.lineTo(px + 28, py - 6);
+  ctx.stroke();
+
+  // Ghost first (so primary draws over it)
+  if (chaosOn && s2) {
+    drawPendulum(s2, {
+      rodColor: 'rgba(255,96,144,.55)',
+      bob1Color: 'rgb(255,120,160)',
+      bob2Color: 'rgb(255,96,144)',
+      alpha: 0.7
+    });
+  }
+  // Primary pendulum
+  drawPendulum(s1, {
+    rodColor: 'rgba(180,200,255,.85)',
+    bob1Color: 'rgb(240,192,96)',
+    bob2Color: 'rgb(32,208,255)',
+    alpha: 1.0,
+    label1: '1', label2: '2'
+  });
+
+  // Divergence indicator if chaos demo
+  if (chaosOn && s2) {
+    const dt1 = ((s1[0] - s2[0] + Math.PI) % (2*Math.PI)) - Math.PI;
+    const dt2 = ((s1[2] - s2[2] + Math.PI) % (2*Math.PI)) - Math.PI;
+    const sep = Math.sqrt(dt1*dt1 + dt2*dt2);
+    ctx.fillStyle = 'rgba(255,96,144,.85)';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Δθ = ${sep.toFixed(4)} rad`, 30, H - 32);
+    const t = simTime;
+    if (t > 0.1) {
+      const lyap = Math.log(Math.max(sep, 1e-10) / 0.001) / t;
+      ctx.fillStyle = 'rgba(255,160,200,.7)';
+      ctx.fillText(`λ ≈ ${lyap.toFixed(3)} s⁻¹  (Lyapunov est.)`, 30, H - 16);
+    }
+  }
+}
+
+// ── Phase space plot ─────────────────────────────────────────────────────────
+function drawPhase() {
+  const w = phaseCanvas.width, h = phaseCanvas.height;
+  pctx.fillStyle = '#0c1830';
+  pctx.fillRect(0, 0, w, h);
+
+  // Axes
+  pctx.strokeStyle = 'rgba(80,110,160,.4)';
+  pctx.lineWidth = 1;
+  pctx.beginPath();
+  pctx.moveTo(w/2, 0); pctx.lineTo(w/2, h);
+  pctx.moveTo(0, h/2); pctx.lineTo(w, h/2);
+  pctx.stroke();
+
+  // Labels
+  pctx.fillStyle = 'rgba(120,150,200,.6)';
+  pctx.font = '9px monospace';
+  pctx.textAlign = 'right';
+  pctx.fillText('θ̇₁', w - 4, h/2 - 4);
+  pctx.textAlign = 'left';
+  pctx.fillText('θ₁', w/2 + 4, 10);
+
+  // Plot points
+  const SX = w / (2 * Math.PI * 1.3);
+  const SY = h / 24;
+  for (let i = 1; i < phasePts.length; i++) {
+    const p0 = phasePts[i-1], p1 = phasePts[i];
+    const x0 = w/2 + p0.t * SX, y0 = h/2 - p0.w * SY;
+    const x1 = w/2 + p1.t * SX, y1 = h/2 - p1.w * SY;
+    const a = i / phasePts.length;
+    pctx.strokeStyle = `hsla(195,90%,65%,${(a*0.7).toFixed(3)})`;
+    pctx.lineWidth = 1;
+    pctx.beginPath();
+    pctx.moveTo(x0, y0); pctx.lineTo(x1, y1);
+    pctx.stroke();
+  }
+
+  // Current point
+  if (phasePts.length > 0) {
+    const p = phasePts[phasePts.length-1];
+    const x = w/2 + p.t * SX, y = h/2 - p.w * SY;
+    pctx.beginPath(); pctx.arc(x, y, 3, 0, Math.PI*2);
+    pctx.fillStyle = '#20d0ff'; pctx.fill();
+  }
+}
+
+// ── Live readout ─────────────────────────────────────────────────────────────
+function updateReadout() {
+  const e = energies(s1);
+  const M = m1 + m2;
+  // Maximum possible PE/KE for normalization (everything horizontal)
+  const Emax = (M*L1 + m2*L2) * g * 1.5; // rough scale
+
+  document.getElementById('ke-val').textContent = e.T.toFixed(2) + ' J';
+  document.getElementById('pe-val').textContent = e.V.toFixed(2) + ' J';
+  document.getElementById('te-val').textContent = e.E.toFixed(2) + ' J';
+  document.getElementById('ke-bar').style.width = Math.min(100, (e.T/Emax)*100) + '%';
+  document.getElementById('pe-bar').style.width = Math.min(100, ((e.V + Emax/2)/Emax)*100) + '%';
+
+  // Normalize angles to [-π, π] for display
+  const norm = a => ((a + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
+  const t1 = norm(s1[0]), t2 = norm(s1[2]);
+
+  const rows = [
+    ['Angle 1',     'θ₁',  `${(t1*180/Math.PI).toFixed(1)}°`,         `${t1.toFixed(3)} rad`],
+    ['Angle 2',     'θ₂',  `${(t2*180/Math.PI).toFixed(1)}°`,         `${t2.toFixed(3)} rad`],
+    ['Ang. vel. 1', 'θ̇₁', `${s1[1].toFixed(2)} rad/s`,                `${(s1[1]/(2*Math.PI)).toFixed(2)} Hz`],
+    ['Ang. vel. 2', 'θ̇₂', `${s1[3].toFixed(2)} rad/s`,                `${(s1[3]/(2*Math.PI)).toFixed(2)} Hz`],
+    ['Kinetic E',   'T',   `${e.T.toFixed(2)} J`,                      ''],
+    ['Potential E', 'V',   `${e.V.toFixed(2)} J`,                      'rel. to pivot'],
+    ['Total E',     'E',   `${e.E.toFixed(2)} J`,                      damping > 0 ? 'decaying' : 'conserved'],
+  ];
+
+  document.getElementById('readout').innerHTML = rows.map(([n,sym,v,note])=>`
+    <tr>
+      <td>${n}</td><td style="color:var(--gold)">${sym}</td>
+      <td style="color:var(--cyan)">${v}</td>
+      <td style="color:var(--text3);font-size:10px;">${note}</td>
+    </tr>`).join('');
+}
+setInterval(updateReadout, 150);
+
+// ── Main loop ────────────────────────────────────────────────────────────────
+function loop(ts) {
+  if (!lastTs) lastTs = ts;
+  let dt = (ts - lastTs) / 1000;
+  lastTs = ts;
+  // Cap step (e.g. tab switched)
+  if (dt > 0.05) dt = 0.05;
+
+  if (!paused && !dragging) {
+    s1 = step(s1, dt);
+    if (chaosOn && s2) s2 = step(s2, dt);
+    simTime += dt;
+
+    // Record trails
+    const b = bobPositions(s1);
+    trail1.push({ x: b.x2, y: b.y2 });
+    if (trail1.length > TRAIL_MAX) trail1.shift();
+    if (chaosOn && s2) {
+      const b2 = bobPositions(s2);
+      trail2.push({ x: b2.x2, y: b2.y2 });
+      if (trail2.length > TRAIL_MAX) trail2.shift();
+    }
+
+    // Phase samples — sub-sample to keep it readable
+    const norm = a => ((a + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
+    phasePts.push({ t: norm(s1[0]), w: s1[1] });
+    if (phasePts.length > PHASE_MAX) phasePts.shift();
+  }
+
+  render();
+  drawPhase();
+
+  document.getElementById('badge-time').textContent = `t = ${simTime.toFixed(2)} s`;
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// ── Sliders ──────────────────────────────────────────────────────────────────
+function bindSlider(id, displayId, setter, fmt, sub) {
+  const el = document.getElementById(id);
+  el.oninput = function() {
+    const v = parseFloat(this.value);
+    setter(v);
+    document.getElementById(displayId).textContent = fmt(v);
+    if (sub) sub(v);
+  };
+}
+bindSlider('sl-L1', 'L1-v', v => L1 = v, v => v.toFixed(2) + ' m');
+bindSlider('sl-L2', 'L2-v', v => L2 = v, v => v.toFixed(2) + ' m');
+bindSlider('sl-m1', 'm1-v', v => m1 = v, v => v.toFixed(2) + ' kg');
+bindSlider('sl-m2', 'm2-v', v => m2 = v, v => v.toFixed(2) + ' kg');
+bindSlider('sl-g',  'g-v',  v => g  = v, v => v.toFixed(2) + ' m/s²', v => {
+  const sub = document.getElementById('g-sub');
+  if (Math.abs(v - 9.81) < 0.5)      sub.textContent = 'Earth gravity';
+  else if (Math.abs(v - 1.62) < 0.3) sub.textContent = 'Lunar gravity';
+  else if (Math.abs(v - 3.71) < 0.3) sub.textContent = 'Mars gravity';
+  else if (v < 3)                    sub.textContent = 'Low-gravity world';
+  else if (v > 20)                   sub.textContent = 'Crushing gas-giant gravity';
+  else                                sub.textContent = 'Custom planetary gravity';
+});
+bindSlider('sl-damp', 'damp-v', v => damping = v, v => v.toFixed(3));
+
+// ── Buttons ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-pause').onclick = function() {
+  paused = !paused;
+  this.textContent = paused ? '▶ Play' : '⏸ Pause';
+  this.classList.toggle('lit', paused);
+};
+document.getElementById('btn-reset').onclick = () => {
+  s1 = [Math.PI * 0.6, 0, Math.PI * 0.5, 0];
+  s2 = chaosOn ? [s1[0] + 0.001, 0, s1[2], 0] : null;
+  simTime = 0;
+  clearTrails();
+};
+document.getElementById('btn-trail').onclick = function() {
+  trailOn = !trailOn;
+  this.classList.toggle('lit', trailOn);
+  if (!trailOn) clearTrails();
+};
+document.getElementById('btn-chaos').onclick = function() {
+  chaosOn = !chaosOn;
+  this.classList.toggle('chaos-on', chaosOn);
+  this.textContent = chaosOn ? '⚡ Chaos ON' : '⚡ Chaos Demo';
+  if (chaosOn) {
+    s2 = [s1[0] + 0.001, s1[1], s1[2], s1[3]];
+    trail2 = [];
+    simTime = 0; // reset clock so Lyapunov estimate makes sense
+  } else {
+    s2 = null;
+    trail2 = [];
+  }
+};
+
+// Presets
+document.querySelectorAll('[data-preset]').forEach(btn => {
+  btn.onclick = function() {
+    const p = this.dataset.preset;
+    if (p === 'gentle')      s1 = [Math.PI*0.15, 0, Math.PI*0.1, 0];
+    if (p === 'chaotic')     s1 = [Math.PI*0.85, 0, Math.PI*0.85, 0];
+    if (p === 'symmetric')   s1 = [Math.PI*0.5, 0, Math.PI*0.5, 0];
+    if (p === 'extreme')     s1 = [Math.PI*0.95, 2, Math.PI*0.95, -2];
+    if (chaosOn) s2 = [s1[0] + 0.001, s1[1], s1[2], s1[3]];
+    simTime = 0; clearTrails();
+  };
+});
+
+// ── Mouse / touch — drag bobs to reposition ─────────────────────────────────
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const cl = e.touches ? e.touches[0] : e;
+  return { x: (cl.clientX - rect.left) * (W / rect.width),
+           y: (cl.clientY - rect.top)  * (H / rect.height) };
+}
+
+function startDrag(e) {
+  const p = getPos(e);
+  const b = bobPositions(s1);
+  if (Math.hypot(p.x - b.x1, p.y - b.y1) < 22) { dragging = 'b1'; e.preventDefault(); return; }
+  if (Math.hypot(p.x - b.x2, p.y - b.y2) < 22) { dragging = 'b2'; e.preventDefault(); return; }
+}
+
+function moveDrag(e) {
+  if (!dragging) return;
+  e.preventDefault();
+  const p = getPos(e);
+  const { x: px, y: py, scale } = (() => {
+    const piv = pivotPos();
+    return { ...piv, scale: Math.min(W,H)*0.18 };
+  })();
+  if (dragging === 'b1') {
+    // angle of bob1 from pivot
+    const dx = p.x - px, dy = p.y - py;
+    s1[0] = Math.atan2(dx, dy);
+    s1[1] = 0;
+  } else {
+    // angle of bob2 from bob1
+    const b = bobPositions(s1);
+    const dx = p.x - b.x1, dy = p.y - b.y1;
+    s1[2] = Math.atan2(dx, dy);
+    s1[3] = 0;
+  }
+  // Reset velocities so the user releases from rest
+  if (dragging === 'b1') s1[1] = 0;
+  if (dragging === 'b2') s1[3] = 0;
+  if (chaosOn) s2 = [s1[0] + 0.001, s1[1], s1[2], s1[3]];
+  clearTrails();
+  simTime = 0;
+}
+
+function endDrag() { dragging = null; }
+
+canvas.addEventListener('mousedown',  startDrag);
+canvas.addEventListener('mousemove',  moveDrag);
+canvas.addEventListener('mouseup',    endDrag);
+canvas.addEventListener('mouseleave', endDrag);
+canvas.addEventListener('touchstart', startDrag, {passive:false});
+canvas.addEventListener('touchmove',  moveDrag,  {passive:false});
+canvas.addEventListener('touchend',   endDrag);
+
+// Initial activation
+document.getElementById('btn-trail').classList.add('lit');
+</script>
+</body>
+</html>

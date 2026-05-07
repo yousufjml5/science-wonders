@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-32ZMW31TWT"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-32ZMW31TWT');
 </script>
 <meta charset="UTF-8">
@@ -27,7 +26,7 @@ header {
 .hero { text-align: center; padding: 70px 20px 50px; }
 .hero h1 { font-size: 32px; font-weight: normal; color: #ddeeff; letter-spacing: 2px; margin-bottom: 14px; }
 .hero p { font-size: 15px; color: #5878a0; max-width: 520px; margin: 0 auto; line-height: 1.8; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 960px; margin: 0 auto; padding: 0 24px 50px; }
 .card {
   background: #080f1e; border: 1px solid #152035;
   border-radius: 12px; padding: 28px; cursor: pointer;
@@ -47,8 +46,45 @@ header {
   display: inline-block; margin-top: 16px; font-family: monospace;
   font-size: 11px; color: #3a8fff; letter-spacing: 1px;
 }
+
+/* About section */
+.about-wrap { max-width: 720px; margin: 30px auto 60px; padding: 0 24px; }
+.about {
+  background: #080f1e; border: 1px solid #152035;
+  border-radius: 12px; padding: 36px 40px;
+  text-align: center;
+}
+.about-label {
+  font-family: monospace; font-size: 10px; letter-spacing: 4px;
+  color: #f0c060; text-transform: uppercase; margin-bottom: 16px;
+}
+.about h2 {
+  font-size: 22px; font-weight: normal; color: #ddeeff;
+  letter-spacing: 1px; margin-bottom: 14px;
+}
+.about-role {
+  font-family: monospace; font-size: 12px; color: #5878a0;
+  letter-spacing: 1.5px; margin-bottom: 22px;
+}
+.about p {
+  font-size: 14px; color: #b8ceec; line-height: 1.9;
+  max-width: 540px; margin: 0 auto;
+}
+.about-links {
+  margin-top: 26px; padding-top: 22px;
+  border-top: 1px solid #152035;
+  display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+}
+.about-links a {
+  font-family: monospace; font-size: 11px; letter-spacing: 1.5px;
+  color: #3a8fff; text-decoration: none; padding: 6px 14px;
+  border: 1px solid #1e3050; border-radius: 5px;
+  transition: all 0.2s;
+}
+.about-links a:hover { border-color: #3a8fff; background: #0c1830; }
+
 footer {
-  text-align: center; padding: 20px;
+  text-align: center; padding: 22px;
   font-family: monospace; font-size: 10px;
   color: #3a5070; border-top: 1px solid #152035; letter-spacing: 3px;
 }
@@ -83,15 +119,14 @@ footer {
     <span class="card-tag">QUANTUM MECHANICS</span>
     <div class="card-link">Launch simulation →</div>
   </a>
-  
+
   <a class="card" href="Doppler_effect.html">
     <div class="card-icon">🔊</div>
     <div class="card-title">Doppler Effect</div>
     <div class="card-desc">Hear and see how sound waves compress and stretch as a source moves. The physics behind ambulance sirens, radar guns, and expanding galaxies.</div>
     <span class="card-tag">WAVE MECHANICS</span>
     <div class="card-link">Launch simulation →</div>
- </a>
-
+  </a>
 
   <a class="card" href="Planet_formation.html">
     <div class="card-icon">🪐</div>
@@ -99,7 +134,7 @@ footer {
     <div class="card-desc">Witness how dust and gas clouds collapse under gravity to form planets. From a swirling protoplanetary disc to rocky worlds and gas giants.</div>
     <span class="card-tag">ASTROPHYSICS</span>
     <div class="card-link">Launch simulation →</div>
-</a>
+  </a>
 
   <a class="card" href="BlackHole.html">
     <div class="card-icon">🌑</div>
@@ -109,7 +144,7 @@ footer {
     <div class="card-link">Launch simulation →</div>
   </a>
 
-<a class="card" href="CarbonDating.html">
+  <a class="card" href="CarbonDating.html">
     <div class="card-icon">⏳</div>
     <div class="card-title">Carbon-14 Dating</div>
     <div class="card-desc">Model the radioactive decay of Carbon-14 isotopes over millennia. Learn how the steady ticking of an atomic clock allows us to calculate the age of ancient organic remains.</div>
@@ -117,14 +152,28 @@ footer {
     <div class="card-link">Launch simulation →</div>
   </a>
 
-<a class="card" href="double-pendulum.html">
+  <a class="card" href="double-pendulum.html">
     <div class="card-icon">⛓️</div>
     <div class="card-title">Double Pendulum</div>
     <div class="card-desc">Explore the "butterfly effect" in action. A simple two-part system that exhibits complex, chaotic behavior, demonstrating how tiny changes in initial conditions lead to vastly different outcomes.</div>
     <span class="card-tag">CHAOS THEORY</span>
     <div class="card-link">Launch simulation →</div>
   </a>
-  
+
+</div>
+
+<!-- ABOUT SECTION -->
+<div class="about-wrap">
+  <div class="about">
+    <div class="about-label">⭐ About the Creator</div>
+    <h2>Hi, I'm Yousuf 👋</h2>
+    <div class="about-role">Physics Researcher</div>
+    <p>I love how a single equation can describe the dance of galaxies or the wobble of a pendulum. With Science Wonders, I am trying to make that beauty visible — not as static formulas, but as living, interactive worlds you can play with right in your browser. My hope is that someone, somewhere, has their first "wow!" moment about physics here.</p>
+    <div class="about-links">
+      <a href="https://scholar.google.com/citations?user=GG5IkQkAAAAJ&hl=en" target="_blank">📚 Google Scholar</a>
+      <a href="https://github.com/yousuf-science" target="_blank">💻 GitHub</a>
+    </div>
+  </div>
 </div>
 
 <footer>SCIENCE WONDERS &nbsp;·&nbsp; OPEN-SOURCE EDUCATIONAL PHYSICS &nbsp;·&nbsp; YOUSUF-SCIENCE</footer>
